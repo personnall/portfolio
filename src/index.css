@@ -2,45 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+  --primary-color: #8b5cf6;
+  --primary-glow: 139, 92, 246;
+}
+
 @layer base {
   body {
-    @apply bg-background text-white;
+    @apply bg-background text-white font-sans overflow-x-hidden;
+    background-image:
+      radial-gradient(circle at 50% 50%, rgba(var(--primary-glow), 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 0% 0%, rgba(6, 182, 212, 0.05) 0%, transparent 30%),
+      radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.05) 0%, transparent 30%);
   }
 }
 
 @layer components {
-  .glass-card {
-    @apply bg-surface/50 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden;
+  .glass-panel {
+    @apply bg-surface/60 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   }
 
-  .neon-border-purple {
-    @apply border-primary/50 shadow-neon-purple;
+  .neon-border {
+    @apply border border-primary/30 relative;
+    box-shadow: 0 0 10px rgba(var(--primary-glow), 0.1);
   }
 
-  .neon-border-cyan {
-    @apply border-secondary/50 shadow-neon-cyan;
+  .neon-border::after {
+    content: '';
+    @apply absolute -inset-[1px] rounded-[inherit] pointer-events-none opacity-0 transition-opacity duration-300;
+    box-shadow: 0 0 15px var(--primary-color);
+  }
+
+  .neon-border:hover::after {
+    @apply opacity-20;
   }
 
   .cyber-button {
-    @apply px-6 py-2 bg-primary/20 border border-primary/50 text-primary hover:bg-primary hover:text-white transition-all rounded-md;
+    @apply relative px-6 py-2 overflow-hidden transition-all duration-300 bg-transparent border border-primary/50 text-primary hover:bg-primary/10 hover:text-white active:scale-95 disabled:opacity-50;
+    clip-path: polygon(10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%, 0% 10px);
   }
 
-  .bg-scanlines {
-    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5) 50%);
+  .cyber-input {
+    @apply bg-surface/40 border border-white/10 px-4 py-2 rounded focus:outline-none focus:border-primary/50 transition-colors;
+  }
+
+  .scanline-effect {
+    @apply fixed inset-0 pointer-events-none z-50 overflow-hidden;
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.1) 50%
+    );
     background-size: 100% 4px;
   }
+
+  .terminal-text {
+    @apply font-mono text-sm leading-relaxed;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  }
+
+  .cyber-mode {
+    filter: hue-rotate(90deg) contrast(1.2) brightness(1.2);
+    transition: filter 0.5s ease;
+  }
+
+  .anime-mode {
+    --primary-color: #ec4899;
+    --primary-glow: 236, 72, 153;
+  }
+
+  .anime-mode .glass-panel {
+    @apply border-accent/50;
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.2);
+  }
+
+  .high-contrast {
+    @apply text-white;
+  }
+
+  .high-contrast .text-muted {
+    @apply text-white/70;
+  }
 }
 
-.custom-scrollbar::-webkit-scrollbar {
+/* Custom Scrollbar */
+::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.3);
-  border-radius: 10px;
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.5);
+
+.custom-grid {
+  background-image: radial-gradient(circle, rgba(var(--primary-glow), 0.1) 1px, transparent 1px);
+  background-size: 30px 30px;
 }
+
+@keyframes enter {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes leave {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0; }
+}
+
+.animate-enter { animation: enter 0.3s ease-out forwards; }
+.animate-leave { animation: leave 0.3s ease-in forwards; }
