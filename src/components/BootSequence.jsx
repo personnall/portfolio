@@ -34,6 +34,9 @@ const BootSequence = ({ onComplete }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // Safe class merger
+  const cn = (...classes) => classes.filter(Boolean).join(' ');
+
   return (
     <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-[100] font-mono p-4">
       <AnimatePresence mode="wait">
@@ -59,7 +62,7 @@ const BootSequence = ({ onComplete }) => {
                   key={i}
                   initial={{ x: -10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  className={cn("text-sm", log.startsWith('[') ? "text-secondary font-bold" : "text-primary/80")}
+                  className={cn("text-sm", (typeof log === 'string' && log.startsWith('[')) ? "text-secondary font-bold" : "text-primary/80")}
                 >
                   {log}
                 </motion.div>
@@ -101,7 +104,5 @@ const BootSequence = ({ onComplete }) => {
     </div>
   );
 };
-
-const cn = (...classes) => classes.filter(Boolean).join(' ');
 
 export default BootSequence;
