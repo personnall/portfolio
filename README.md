@@ -56,13 +56,32 @@ MianOS is a high-end, immersive "Developer Operating System" portfolio built wit
 4. **Storage:**
    Create a public bucket named `portfolio` for certificate and project media.
 
-## 🌐 Deployment
+## 🌐 Netlify Deployment Guide
 
-### Vercel / Netlify
-1. Connect your GitHub repository.
-2. Set the `Build Command` to `npm run build`.
-3. Set the `Output Directory` to `dist`.
-4. Add the Environment Variables from your `.env` file.
+Follow these steps to host MianOS on Netlify:
+
+### 1. Initial Deployment
+1. Log in to your [Netlify Dashboard](https://app.netlify.com/).
+2. Click **Add new site** > **Import an existing project**.
+3. Connect your GitHub repository.
+4. Set the following Build Settings:
+   - **Build Command:** `npm run build`
+   - **Publish directory:** `dist`
+5. Click **Deploy site**.
+
+### 2. Storing Supabase Secrets (Environment Variables)
+To ensure the OS can communicate with your database, you must add your secrets to Netlify:
+
+1. Go to **Site Configuration** > **Environment variables**.
+2. Click **Add a variable** > **Import from .env** or **Add a single variable**.
+3. Add the following keys:
+   - `VITE_SUPABASE_URL`: Your Supabase Project URL.
+   - `VITE_SUPABASE_ANON_KEY`: Your Supabase Anon Key.
+4. Click **Save**.
+5. Trigger a new deploy via **Deploys** > **Trigger deploy** to apply the changes.
+
+### 3. SPA Routing
+MianOS uses `react-router-dom`. The included `netlify.toml` automatically handles the redirect rules so that manual page refreshes on sub-routes (like `/projects`) don't return 404 errors.
 
 ## ⌨️ Commands & Shortcuts
 - `Ctrl + K`: Open Command Palette.
