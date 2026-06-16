@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LayoutDashboard, FolderDot, Zap, History, GraduationCap, Award, Activity, LogOut, User, Settings as SettingsIcon } from 'lucide-react';
 import { useNavigate, NavLink, Outlet } from 'react-router-dom';
+import { api } from '../lib/api';
 import toast from 'react-hot-toast';
 
 export default function AdminLayout() {
@@ -9,13 +10,29 @@ export default function AdminLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('mianos_token');
-    if (!token) navigate('/login');
-    else setIsAuth(true);
-    setLoading(false);
+    const checkSession = async () => {
+      try {
+        const session = await api.getSession();
+        if (!session) navigate('/login');
+        else setIsAuth(true);
+      } catch (err) {
+        navigate('/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkSession();
   }, [navigate]);
 
-  const handleLogout = () => { localStorage.removeItem('mianos_token'); toast.success('Logged out'); navigate('/login'); };
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+      toast.success('Logged out');
+      navigate('/login');
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
 
   if (loading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
   if (!isAuth) return null;

@@ -1,28 +1,68 @@
-const API_URL = '/api/index.php'; // Works when hosted with PHP or proxy
+import { supabase } from './supabase';
+
+// Helper to handle profile table which might return a single row
+const IS_SINGLE = ['profiles'];
 
 export const api = {
-  async request(action, module = '', data = null, method = 'GET') {
-    const token = localStorage.getItem('mianos_token');
-    const url = `${API_URL}?action=${action}&module=${module}` + (action === 'delete' ? `&id=${data}` : '');
+  async get(table) {
+    let query = supabase.from(table).select('*');
 
-    const options = {
-      method: method === 'GET' && (action === 'save' || action === 'login') ? 'POST' : method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-      }
-    };
+    // Custom ordering logic
+    if (table === 'activities') {
+      query = query.order('timestamp', { ascending: false });
+    } else if (['projects', 'skills', 'experience', 'education', 'certificates', 'social_links'].includes(table)) {
+      query = query.order('order_index', { ascending: true });
+    }
 
-    if (data && action !== 'delete') options.body = JSON.stringify(data);
+    if (IS_SINGLE.includes(table)) {
+      const { data, error } = await query.maybeSingle();
+      if (error) throw error;
+      return data;
+    }
 
-    const res = await fetch(url, options);
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || 'Server error');
-    return json;
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
   },
 
-  get: (module) => api.request('get', module),
-  save: (module, data) => api.request('save', module, data, 'POST'),
-  delete: (module, id) => api.request('delete', module, id, 'DELETE'),
-  login: (password) => api.request('login', '', { password }, 'POST')
+  async save(table, data) {
+    const pk = table === 'settings' ? 'key' : 'id';
+    const idValue = data[pk];
+    const { [pk]: _, ...payload } = data;
+    let result;
+
+    if (idValue) {
+      result = await supabase.from(table).update(payload).eq(pk, idValue).select();
+    } else {
+      result = await supabase.from(table).insert([payload]).select();
+    }
+
+    if (result.error) throw result.error;
+    return result.data[0];
+  },
+
+  async delete(table, id) {
+    const pk = table === 'settings' ? 'key' : 'id';
+    const { error } = await supabase.from(table).delete().eq(pk, id);
+    if (error) throw error;
+    return true;
+  },
+
+  // Auth methods
+  async login(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  },
+
+  async logout() {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  },
+
+  async getSession() {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return session;
+  }
 };

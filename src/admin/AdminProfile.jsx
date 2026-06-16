@@ -13,28 +13,17 @@ export default function AdminProfile() {
 
   useEffect(() => {
     if (profile && !form) {
-      const avail = typeof profile.availability_status === 'string'
-        ? JSON.parse(profile.availability_status)
-        : (profile.availability_status || { freelance: true, internship: true, collaboration: true });
-      setForm({ ...profile, availability_status: avail });
+      setForm({ ...profile });
     }
   }, [profile]);
 
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const payload = { ...form, availability_status: JSON.stringify(form.availability_status) };
-      await api.save('profiles', payload);
+      await api.save('profiles', form);
       toast.success('Identity updated');
       queryClient.invalidateQueries(['profile']);
     } catch (err) { toast.error(err.message); }
-  };
-
-  const toggleAvail = (key) => {
-    setForm({
-      ...form,
-      availability_status: { ...form.availability_status, [key]: !form.availability_status[key] }
-    });
   };
 
   if (!form) return null;
@@ -45,21 +34,14 @@ export default function AdminProfile() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <form onSubmit={handleSave} className="glass-card p-8 space-y-6">
-            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Full Name</label><input value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none focus:border-primary/50" /></div>
-            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Title</label><input value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none" /></div>
-            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Bio</label><textarea rows="5" value={form.bio} onChange={e => setForm({...form, bio: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none" /></div>
-
-            <div className="space-y-4">
-              <label className="text-xs uppercase text-white/40">Availability Status</label>
-              <div className="grid grid-cols-3 gap-4">
-                {['freelance', 'internship', 'collaboration'].map(key => (
-                  <button key={key} type="button" onClick={() => toggleAvail(key)} className={`p-3 rounded-xl border flex items-center justify-center gap-2 transition-all ${form.availability_status[key] ? 'bg-primary/20 border-primary text-primary' : 'bg-white/5 border-white/10 text-white/40'}`}>
-                    <CheckCircle2 size={16} />
-                    <span className="text-xs uppercase font-bold">{key}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Full Name</label><input value={form.name || ''} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none focus:border-primary/50" /></div>
+            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Title</label><input value={form.title || ''} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none" /></div>
+            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Location</label><input value={form.location || ''} onChange={e => setForm({...form, location: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none" /></div>
+            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Current Semester</label><input value={form.semester || ''} onChange={e => setForm({...form, semester: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none focus:border-primary/50" /></div>
+            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Age</label><input type="number" value={form.age || ''} onChange={e => setForm({...form, age: parseInt(e.target.value)})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none" /></div>
+            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Bio (Short Intro)</label><textarea rows="3" value={form.bio || ''} onChange={e => setForm({...form, bio: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none" /></div>
+            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Career Goal</label><input value={form.career_goal || ''} onChange={e => setForm({...form, career_goal: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none" /></div>
+            <div className="space-y-2"><label className="text-xs uppercase text-white/40">Availability</label><input value={form.availability_status || ''} onChange={e => setForm({...form, availability_status: e.target.value})} className="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none" placeholder="Open to Internships" /></div>
 
             <button className="cyber-button w-full py-4 flex items-center justify-center gap-2 font-bold uppercase"><Save size={18} /> Synchronize Profile</button>
           </form>

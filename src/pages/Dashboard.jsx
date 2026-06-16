@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useProfile, useProjects } from '../hooks/useData';
 import TerminalWidget from '../components/TerminalWidget';
 import GithubWidget from '../components/GithubWidget';
 import ActivityFeed from '../components/ActivityFeed';
@@ -16,19 +17,22 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
+  const { data: profile } = useProfile();
+  const { data: projects } = useProjects();
+
   const stats = [
     { label: "Projects Completed", value: "15+", icon: Projector, color: "text-primary" },
     { label: "Technologies", value: "10+", icon: Code2, color: "text-secondary" },
     { label: "GitHub Repos", value: "25+", icon: GithubIcon, color: "text-accent" },
-    { label: "Semester", value: "2nd", icon: Rocket, color: "text-green-500" },
+    { label: "Semester", value: profile?.semester || "2nd", icon: Rocket, color: "text-green-500" },
   ];
 
-  const quickProjects = [
-    { name: "PDF Generator", desc: "Custom PDF styling engine", tags: ["React", "Node.js"] },
-    { name: "Anime Stream", desc: "HUD-based streaming UI", tags: ["Supabase", "React"] },
-    { name: "Weather Hub", desc: "Real-time weather data", tags: ["API", "CSS"] },
-    { name: "MianOS", desc: "Developer OS Portfolio", tags: ["React", "Framer"] },
-  ];
+  const quickProjects = projects?.slice(0, 4).map(p => ({
+    id: p.id,
+    name: p.name,
+    desc: p.description,
+    tags: p.technologies?.slice(0, 2) || []
+  })) || [];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20">
@@ -65,25 +69,30 @@ const Dashboard = () => {
 
             <div className="flex-1 space-y-4">
               <div>
-                <h1 className="text-4xl font-black tracking-tight mb-1">MIAN <span className="text-primary">KHIZAR</span></h1>
+                <h1 className="text-4xl font-black tracking-tight mb-1">{profile?.name?.toUpperCase() || 'MIAN KHIZAR'}</h1>
                 <p className="text-muted flex items-center gap-2 text-sm uppercase tracking-widest font-bold">
                   <Briefcase size={14} className="text-primary" />
-                  BSCS Student & Full Stack Developer
+                  {profile?.title || 'BSCS Student & Full Stack Developer'}
                 </p>
                 <p className="text-muted flex items-center gap-2 text-xs mt-1">
                   <MapPin size={12} className="text-primary" />
-                  Pakistan
+                  {profile?.location || 'Pakistan'}
                 </p>
               </div>
 
               <p className="text-white/70 max-w-xl leading-relaxed">
-                Passionate about building futuristic, user-centric web applications. Currently focusing on mastering full-stack development and exploring AI integration in modern OS interfaces.
+                {profile?.bio || 'Passionate about building futuristic, user-centric web applications. Currently focusing on mastering full-stack development and exploring AI integration in modern OS interfaces.'}
               </p>
 
               <div className="flex flex-wrap gap-2 pt-2">
-                 <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-bold text-primary uppercase tracking-wider">Open to Internships</span>
-                 <span className="px-3 py-1 bg-secondary/10 border border-secondary/20 rounded-full text-[10px] font-bold text-secondary uppercase tracking-wider">Freelance Available</span>
-                 <span className="px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-[10px] font-bold text-accent uppercase tracking-wider">Learning Next.js</span>
+                 {profile?.availability_status?.split(',').map(status => (
+                   <span key={status} className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-bold text-primary uppercase tracking-wider">{status.trim()}</span>
+                 )) || (
+                   <>
+                     <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-bold text-primary uppercase tracking-wider">Open to Internships</span>
+                     <span className="px-3 py-1 bg-secondary/10 border border-secondary/20 rounded-full text-[10px] font-bold text-secondary uppercase tracking-wider">Freelance Available</span>
+                   </>
+                 )}
               </div>
             </div>
           </div>

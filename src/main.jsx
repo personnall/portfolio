@@ -30,15 +30,12 @@ const Login = lazy(() => import('./pages/Login.jsx'))
 const AdminLayout = lazy(() => import('./admin/AdminLayout.jsx'))
 const AdminOverview = lazy(() => import('./admin/AdminOverview.jsx'))
 const AdminProjects = lazy(() => import('./admin/AdminProjects.jsx'))
-
-import {
-  AdminSkills as ASkills,
-  AdminActivities as AActivities,
-  AdminProfile as AProfile,
-  AdminExperience as AExperience,
-  AdminEducation as AEducation,
-  AdminCertificates as ACertificates
-} from './admin/AdminStubs.jsx';
+const AdminSkills = lazy(() => import('./admin/AdminSkills.jsx'))
+const AdminActivities = lazy(() => import('./admin/AdminActivities.jsx'))
+const AdminProfile = lazy(() => import('./admin/AdminProfile.jsx'))
+const AdminExperience = lazy(() => import('./admin/AdminExperience.jsx'))
+const AdminEducation = lazy(() => import('./admin/AdminEducation.jsx'))
+const AdminCertificates = lazy(() => import('./admin/AdminCertificates.jsx'))
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } } });
 
@@ -72,12 +69,12 @@ function Root() {
                   <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminOverview />} />
                     <Route path="projects" element={<AdminProjects />} />
-                    <Route path="skills" element={<ASkills />} />
-                    <Route path="activities" element={<AActivities />} />
-                    <Route path="profile" element={<AProfile />} />
-                    <Route path="experience" element={<AExperience />} />
-                    <Route path="education" element={<AEducation />} />
-                    <Route path="certificates" element={<ACertificates />} />
+                    <Route path="skills" element={<AdminSkills />} />
+                    <Route path="activities" element={<AdminActivities />} />
+                    <Route path="profile" element={<AdminProfile />} />
+                    <Route path="experience" element={<AdminExperience />} />
+                    <Route path="education" element={<AdminEducation />} />
+                    <Route path="certificates" element={<AdminCertificates />} />
                     <Route path="settings" element={<Settings />} />
                   </Route>
                 </Routes>
